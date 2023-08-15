@@ -1,0 +1,98 @@
+---
+title: "Untitled"
+author: "GUI GAO"
+date: "2023-08-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(tidytext)
+library(stringr)
+library(lubridate)
+```
+
+
+```{r}
+posts <- read_excel("data/collated_posts.xlsx")
+comments <- read_excel("data/collated_comments.xlsx")
+emojis <- read.csv("data/emojis.csv")
+```
+
+
+```{r}
+rep_str = c("ðŸ˜«" = "A_sad15",
+            "ðŸ˜˜" = "A_kiss1",
+            "ðŸ’" = "E_coupleheart",
+            "ðŸ’–" = "F_sparkleheart",
+            "ðŸ˜¢" = "A_sad6",
+            "ðŸ’œ" = "F_purpleheart",
+            "ðŸ˜" = "A_loveeyes",
+            "â€˜" = "'",
+            "â€™" = "'",
+            "â¤ï¸" = "F_redheart",
+            "ðŸ‘ðŸ½" = "D_clap3",
+            "ðŸ‘ðŸ»" = "D_clap1",
+            "ðŸ‘" = "D_clap",
+            "ðŸ‘‹" = "D_wave",
+            "ðŸ”¥" = "D_fire",
+            "ðŸ™Œ" = "D_td",
+            "ðŸŒˆ" = "K_rainbow",
+            "ðŸ’™" = "F_blueheart",
+            "â™¥ï¸" = "T_card2",
+            "ðŸ™ˆ" = "C_seeno",
+            "ðŸ’›" = "F_yellowheart",
+            "ðŸ’©" = "D_poop",
+            "ðŸˆ" = "H_cat")
+posts$post_caption <- str_replace_all(posts$post_caption, rep_str)
+comments$comment_content <- str_replace_all(comments$comment_content, rep_str)
+```
+
+
+```{r}
+posts$actual_time_stamp <- gsub(",", "",
+                                posts$actual_time_stamp)
+posts$actual_time_stamp <- gsub(" ", "/",
+                                posts$actual_time_stamp)
+
+comments$comment_date_actual <- 
+  gsub(",", "", comments$comment_date_actual)
+comments$comment_date_actual <- 
+  gsub(" ", "/", comments$comment_date_actual)
+
+posts <- posts %>%
+  filter(!grepl("Liked", likes)) %>%
+  separate(likes, c("Numbers", "States"), sep = " ")
+  
+posts$tagged_users <- gsub("\\[|\\]", "", posts$tagged_users)
+posts$tagged_users <- gsub("'", "", posts$tagged_users)
+  
+
+comments$likes <- gsub("Reply", "0", comments$likes)
+comments$likes <- gsub("\\D", "", comments$likes)
+
+comments$comment_date_actual <- mdy(comments$comment_date_actual)
+
+comments <- comments %>%
+  select(commenter_username, comment_content,
+         comment_date_actual, likes, post_url) %>%
+  rename("Username" = "commenter_username",
+         "Content" = "comment_content",
+         "Date" = "comment_date_actual",
+         "Likes_number" = "likes",
+         "Post_url" = "post_url") %>%
+  filter(!is.na(Date))
+```
+
+
+
+
+
+
+
