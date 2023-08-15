@@ -206,6 +206,9 @@ FB_Telco_comments_wip <- FB_Telco_comments
 
 FB_Telco_comments_wip$comment_content <- comment_tibble$value
 
+FB_Telco_comments_wip <- FB_Telco_comments_wip$comment_date %>% 
+  add_with_rollback(as.POSIXct("2023-08-14 13:12:00 AEST"), -as.period(sub("\\s", "", comments$comment_date)))
+
 ## !! Not Clean Yet !!
 
 # Change df to confirmed clean df
