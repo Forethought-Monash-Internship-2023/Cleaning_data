@@ -66,7 +66,7 @@ FB_Telco_comments$comment_content <- str_replace_all(FB_Telco_comments$comment_c
 ## !! Not Clean Yet !!
 ```{r}
 IG_Telco_posts$actual_time_stamp <- gsub(",", "",
-                                IG_Telco_posts$actual_time_stamp)
+                                         IG_Telco_posts$actual_time_stamp)
 IG_Telco_posts$actual_time_stamp <- gsub(" ", "/",
                                 IG_Telco_posts$actual_time_stamp)
 
@@ -85,6 +85,8 @@ IG_Telco_posts_wip <- IG_Telco_posts_wip%>%
 ## Change post_date from Char to Date
 ## !! Not Clean Yet !!
 
+IG_Telco_posts_wip$post_date <-
+  mdy(IG_Telco_posts_wip$post_date)
 
 # Clean Unnecessary Texts from Columns 
 IG_Telco_posts_clean <- IG_Telco_posts_wip %>%
@@ -103,7 +105,8 @@ IG_Telco_comments$comment_date_actual <-
 IG_Telco_comments$likes <- gsub("Reply", "0", IG_Telco_comments$likes)
 IG_Telco_comments$likes <- gsub("\\D", "", IG_Telco_comments$likes)
 
-IG_Telco_comments$comment_date_actual <- mdy(IG_Telco_comments$comment_date_actual)
+IG_Telco_comments$comment_date_actual <-
+  mdy(IG_Telco_comments$comment_date_actual)
 
 IG_Telco_comments_clean <- IG_Telco_comments %>%
   select(commenter_username, comment_content,
@@ -206,8 +209,14 @@ FB_Telco_comments_wip <- FB_Telco_comments
 
 FB_Telco_comments_wip$comment_content <- comment_tibble$value
 
-FB_Telco_comments_wip <- FB_Telco_comments_wip$comment_date %>% 
-  add_with_rollback(as.POSIXct("2023-08-14 13:12:00 AEST"), -as.period(sub("\\s", "", comments$comment_date)))
+FB_Telco_comments_wip$comment_date <-
+  add_with_rollback(as.POSIXct("2023-08-15 13:12:00 AEST"),
+                    -as.period(sub("\\s", "",
+                    FB_Telco_comments_wip$comment_date)))
+
+FB_Telco_comments_wip <- FB_Telco_comments_wip %>%
+  mutate(Date = as.Date(comment_date, format = "%m%d%Y"),
+         Hour = str_sub(comment_date, 12, 13))
 
 ## !! Not Clean Yet !!
 
