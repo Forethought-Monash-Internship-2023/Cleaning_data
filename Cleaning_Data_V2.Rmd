@@ -63,7 +63,7 @@ FB_Telco_comments$comment_content <- str_replace_all(FB_Telco_comments$comment_c
 
 
 #IG Posts Cleaning
-## !! Not Clean Yet !!
+## !! Clean !!
 ```{r}
 IG_Telco_posts$actual_time_stamp <- gsub(",", "",
                                          IG_Telco_posts$actual_time_stamp)
@@ -90,11 +90,15 @@ IG_Telco_posts_wip$post_date <-
 
 # Clean Unnecessary Texts from Columns 
 IG_Telco_posts_clean <- IG_Telco_posts_wip %>%
-  mutate(brand = str_extract(brand, "Optus|Telstra|Vodafone AU|amaysim"))
+  mutate(brand = str_extract(brand, "Optus|Telstra|Vodafone AU|amaysim")) %>% 
+  rename("numbers" = "Numbers",
+         "interactions" = "States")
 ```
+## !! Clean !!
 
 
 #IG Comments Cleaning
+## !! Clean !!
 ```{r}
 
 IG_Telco_comments$comment_date_actual <- 
@@ -116,10 +120,16 @@ IG_Telco_comments_clean <- IG_Telco_comments %>%
          "Date" = "comment_date_actual",
          "Likes_number" = "likes",
          "Post_url" = "post_url") %>%
-  filter(!is.na(Date))
+  filter(!is.na(Date)) %>% 
+  rename("username" = "Username",
+         "content" = "Content",
+         "date" = "Date",
+         "likes_number" = "Likes_number",
+         "post_url" = "Post_url")
 
-## Clean!!
 ```
+## !! Clean !!
+
 
 
 # Clean FB_post
@@ -185,13 +195,12 @@ FB_Telco_posts_wip <- FB_Telco_posts_wip %>%
 # Change df to confirmed clean df
 FB_Telco_posts_clean <- FB_Telco_posts_wip
 
-## Clean!!
 ```
-
+## !! Clean !!
 
 
 # Clean FB_comment
-## !! Not Clean Yet !!
+## !! Clean !!
 ```{r}
 # Assuming html_strings is a vector of HTML strings
 comment_text <- character(length(FB_Telco_comments$comment_content))  # Create an empty vector to store extracted text
@@ -216,14 +225,17 @@ FB_Telco_comments_wip$comment_date <-
 
 FB_Telco_comments_wip <- FB_Telco_comments_wip %>%
   mutate(Date = as.Date(comment_date, format = "%m%d%Y"),
-         Hour = str_sub(comment_date, 12, 13))
+         Hour = str_sub(comment_date, 12, 13)) %>% 
+  rename("post_date" = "Date",
+         "post_time_hr" = "Hour") %>% 
+  select(-c("comment_date"))
 
 ## !! Not Clean Yet !!
 
 # Change df to confirmed clean df
 FB_Telco_comments_clean <- FB_Telco_comments_wip
 ```
-
+## !! Clean !!
 
 
 
