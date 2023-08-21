@@ -88,6 +88,8 @@ IG_Telco_posts_wip <- IG_Telco_posts_wip%>%
 IG_Telco_posts_wip$post_date <-
   mdy(IG_Telco_posts_wip$post_date)
 
+IG_Telco_posts_wip$Numbers <- as.numeric(gsub(",", "", IG_Telco_posts_wip$Numbers))
+
 # Clean Unnecessary Texts from Columns 
 IG_Telco_posts_clean <- IG_Telco_posts_wip %>%
   mutate(brand = str_extract(brand, "Optus|Telstra|Vodafone AU|amaysim")) %>% 
