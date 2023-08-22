@@ -114,6 +114,8 @@ IG_Telco_comments$likes <- gsub("\\D", "", IG_Telco_comments$likes)
 IG_Telco_comments$comment_date_actual <-
   mdy(IG_Telco_comments$comment_date_actual)
 
+IG_Telco_comments$likes <- as.numeric(IG_Telco_comments$likes)
+
 IG_Telco_comments_clean <- IG_Telco_comments %>%
   select(commenter_username, comment_content,
          comment_date_actual, likes, post_url) %>%
@@ -238,6 +240,4 @@ FB_Telco_comments_wip <- FB_Telco_comments_wip %>%
 FB_Telco_comments_clean <- FB_Telco_comments_wip
 ```
 ## !! Clean !!
-
-
 
