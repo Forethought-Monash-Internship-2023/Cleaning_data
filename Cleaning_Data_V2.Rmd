@@ -6,7 +6,8 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = F)
 ```
 
 
@@ -65,36 +66,23 @@ FB_Telco_comments$comment_content <- str_replace_all(FB_Telco_comments$comment_c
 #IG Posts Cleaning
 ## !! Clean !!
 ```{r}
-IG_Telco_posts$actual_time_stamp <- gsub(",", "",
-                                         IG_Telco_posts$actual_time_stamp)
-IG_Telco_posts$actual_time_stamp <- gsub(" ", "/",
-                                IG_Telco_posts$actual_time_stamp)
-
-IG_Telco_posts_wip <- IG_Telco_posts %>%
+IG_Telco_posts_clean <- IG_Telco_posts %>%
+  mutate(actual_time_stamp = gsub(",", "", actual_time_stamp),
+         actual_time_stamp = gsub(" ", "/", actual_time_stamp)) %>%
   filter(!grepl("Liked", likes)) %>%
-  separate(likes, c("Numbers", "States"), sep = " ")
-  
-IG_Telco_posts_wip$tagged_users <- gsub("\\[|\\]", "", IG_Telco_posts_wip$tagged_users)
-IG_Telco_posts_wip$tagged_users <- gsub("'", "", IG_Telco_posts_wip$tagged_users)
-  
-IG_Telco_posts_wip <- IG_Telco_posts_wip%>% 
+  separate(likes, c("numbers", "interactions"), sep = " ") %>%
+  mutate(tagged_users = gsub("\\[|\\]", "", tagged_users),
+         tagged_users = gsub("'", "", tagged_users),
+         actual_time_stamp = mdy(actual_time_stamp),
+         numbers = as.numeric(gsub(",", "", numbers)),
+         brand = str_extract(brand, 
+                             "Optus|Telstra|Vodafone AU|amaysim")) %>% 
   select(-c("relative_time_stamp", "tagged_locations")) %>% 
   rename("post_date" = "actual_time_stamp")
-
+  
 ## Change Number to Numeric
 ## Change post_date from Char to Date
 ## !! Not Clean Yet !!
-
-IG_Telco_posts_wip$post_date <-
-  mdy(IG_Telco_posts_wip$post_date)
-
-IG_Telco_posts_wip$Numbers <- as.numeric(gsub(",", "", IG_Telco_posts_wip$Numbers))
-
-# Clean Unnecessary Texts from Columns 
-IG_Telco_posts_clean <- IG_Telco_posts_wip %>%
-  mutate(brand = str_extract(brand, "Optus|Telstra|Vodafone AU|amaysim")) %>% 
-  rename("numbers" = "Numbers",
-         "interactions" = "States")
 ```
 ## !! Clean !!
 
@@ -102,34 +90,18 @@ IG_Telco_posts_clean <- IG_Telco_posts_wip %>%
 #IG Comments Cleaning
 ## !! Clean !!
 ```{r}
-
-IG_Telco_comments$comment_date_actual <- 
-  gsub(",", "", IG_Telco_comments$comment_date_actual)
-IG_Telco_comments$comment_date_actual <- 
-  gsub(" ", "/", IG_Telco_comments$comment_date_actual)
-
-IG_Telco_comments$likes <- gsub("Reply", "0", IG_Telco_comments$likes)
-IG_Telco_comments$likes <- gsub("\\D", "", IG_Telco_comments$likes)
-
-IG_Telco_comments$comment_date_actual <-
-  mdy(IG_Telco_comments$comment_date_actual)
-
-IG_Telco_comments$likes <- as.numeric(IG_Telco_comments$likes)
-
 IG_Telco_comments_clean <- IG_Telco_comments %>%
+  mutate(comment_date_actual = gsub(",", "", comment_date_actual),
+         comment_date_actual = mdy(gsub(" ", "/", comment_date_actual)),
+         likes = gsub("Reply", "0", likes),
+         likes = as.numeric(gsub("\\D", "", likes))) %>%
   select(commenter_username, comment_content,
          comment_date_actual, likes, post_url) %>%
-  rename("Username" = "commenter_username",
-         "Content" = "comment_content",
-         "Date" = "comment_date_actual",
-         "Likes_number" = "likes",
-         "Post_url" = "post_url") %>%
-  filter(!is.na(Date)) %>% 
-  rename("username" = "Username",
-         "content" = "Content",
-         "date" = "Date",
-         "likes_number" = "Likes_number",
-         "post_url" = "Post_url")
+  rename("username" = "commenter_username",
+         "content" = "comment_content",
+         "date" = "comment_date_actual",
+         "likes_number" = "likes") %>%
+  filter(!is.na(date))
 
 ```
 ## !! Clean !!
