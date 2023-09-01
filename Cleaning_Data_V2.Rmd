@@ -178,38 +178,18 @@ FB_Telco_posts_clean <- FB_Telco_posts_wip
 # Clean FB_comment
 ## !! Clean !!
 ```{r}
-# Assuming html_strings is a vector of HTML strings
-comment_text <- character(length(FB_Telco_comments$comment_content))  # Create an empty vector to store extracted text
-
-for (i in seq_along(FB_Telco_comments$comment_content)) {
-  # Use regular expressions to extract the comment content
-  comment_text[i] <- gsub("<[^>]+>", "", FB_Telco_comments$comment_content[i])  # Remove HTML tags
-  comment_text[i] <- gsub("\\s+", " ", comment_text[i])  # Remove extra spaces
-}
-
-# Convert the result to a tibble if needed
-comment_tibble <- as_tibble(comment_text)
-
-FB_Telco_comments_wip <- FB_Telco_comments
-
-FB_Telco_comments_wip$comment_content <- comment_tibble$value
-
-FB_Telco_comments_wip$comment_date <-
-  add_with_rollback(as.POSIXct("2023-08-15 13:12:00 AEST"),
-                    -as.period(sub("\\s", "",
-                    FB_Telco_comments_wip$comment_date)))
-
-FB_Telco_comments_wip <- FB_Telco_comments_wip %>%
-  mutate(Date = as.Date(comment_date, format = "%m%d%Y"),
-         Hour = str_sub(comment_date, 12, 13)) %>% 
+FB_Telco_comments_clean <- FB_Telco_comments %>%
+  mutate(comment_content = gsub("<[^>]+>", "", comment_content),
+         comment_content = gsub("\\s+", " ", comment_content),
+         comment_date = add_with_rollback(as.POSIXct("2023-08-15 13:12:00 AEST"),
+                                          -as.period(sub("\\s", "",
+                                                         comment_date))),
+         Date = as.Date(comment_date, format = "%m%d%Y"),
+         Hour = str_sub(comment_date, 12, 13)) %>%
   rename("post_date" = "Date",
          "post_time_hr" = "Hour") %>% 
   select(-c("comment_date"))
-
 ## !! Not Clean Yet !!
-
-# Change df to confirmed clean df
-FB_Telco_comments_clean <- FB_Telco_comments_wip
 ```
 ## !! Clean !!
 
